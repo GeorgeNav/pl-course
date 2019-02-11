@@ -65,7 +65,7 @@ class Lexer:
                 self.col += 2
             elif self.text[self.col-1] == ',':
                 tokens.append(Token(Location(self.line, self.col), TokenKind.COMMA, 'comma'))
-            elif self.text[self.col-1] == '\\' or self.text[self.col-1] == '=' or self.text[self.col-1] == '<':
+            elif self.text[self.col-1] == '/' or self.text[self.col-1] == '\\' or self.text[self.col-1] == '=' or self.text[self.col-1] == '<':
                 invalid_tokens.append(Token(Location(self.line, self.col), None, self.text[self.col-1]))
             elif self.text[self.col-1] != ' ': # any other invalid character
                 invalid_tokens.append(Token(Location(self.line, self.col), None, self.text[self.col-1]))
