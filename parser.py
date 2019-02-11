@@ -25,7 +25,7 @@ class Parser:
         else:
             print(self.errors)
             return 'Error(s) -> ' + str(self.errors).replace('[', '[ ').replace(']', ' ]')
-    
+
     def find_error(self):
         wrappers = 0
         for i, token in enumerate(self.tokenlist):

@@ -1,13 +1,13 @@
 Input #1:
 ---------
-Proposition			: Q$
-SyntaxError(s)		: $ (line 1, col 2)
+Proposition			: Q
+Lexer				: [ ID ]
+Parser				: [ propositions, proposition, atomic, ID, more_propositions, epsilon ]
 
 Input #2:
 ---------
-Proposition			: !Q
-Lexer				: [ NOT, ID ]
-Parser				: [ propositions, proposition, compound, NOT, proposition, atomic, ID, more_propositions, epsilon ]
+Proposition			: !Q=
+SyntaxError(s)		: = (line 2, col 3)
 
 Input #3:
 ---------
@@ -47,7 +47,7 @@ Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID
 
 Input #9:
 ---------
-Proposition			: Q =>
-Lexer				: [ ID, IMPLIES ]
-Parser				: Error(s) -> [ Missing value ]
+Proposition			: Q => P
+Lexer				: [ ID, IMPLIES, ID ]
+Parser				: [ propositions, proposition, compound, ID, connective, IMPLIES, proposition, atomic, ID, more_propositions, epsilon ]
 
