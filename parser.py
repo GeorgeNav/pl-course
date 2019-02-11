@@ -70,7 +70,7 @@ class Parser:
     def compound(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
         if self.top() == TokenKind.ID:
-            self.pop() # ID or RPAR
+            self.atomic() # ID or RPAR
             self.connective()
             self.proposition()
         elif self.isConnective(self.top()):
