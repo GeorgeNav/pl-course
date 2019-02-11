@@ -18,49 +18,57 @@ class TokenKind:
     COMMA = 8 # ,
 
 class Token:
-    def __init__(self, loc, kind):
+    def __init__(self, loc, kind, text):
         self.loc = loc
         self.kind = kind
+        self.text = text
 
     def __str__(self):
-        return str(self.kind)
-    
+        return self.text
+
+    def __repr__(self):
+        return '\'' + str(self) + '\''
 
 class Lexer:
-    def __init__(self, text):
+    def __init__(self, text, line):
         self.text = text
-        self.line = 1
+        self.line = line
         self.col = 1
-        self.tokens = []
 
     def tokenize(self):
+        tokens = []
+        invalid_tokens = []
         while self.col <= len(self.text):
             if self.text[self.col-1].isalpha() and self.text[self.col-1].isupper():
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.ID))
+                if(len(tokens) > 0 and tokens[-1].kind == TokenKind.ID
+                and self.text[self.col-2] != ' '):
+                    tokens[-1].text += self.text[self.col-1]
+                else:
+                    tokens.append(Token(Location(self.line, self.col), TokenKind.ID, 'ID'))
             elif self.text[self.col-1] == '(':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.LPAR))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.LPAR, 'LPAR'))
             elif self.text[self.col-1] == ')':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.RPAR))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.RPAR, 'RPAR'))
             elif self.text[self.col-1] == '!':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.NOT))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.NOT, 'NOT'))
             elif self.text[self.col-1] == '/' and self.col <= len(self.text)-1 and self.text[self.col] == '\\':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.AND))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.AND, 'AND'))
                 self.col += 1
             elif self.text[self.col-1] == '\\' and self.col <= len(self.text)-1 and self.text[self.col] == '/':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.OR))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.OR, 'OR'))
                 self.col += 1
             elif self.text[self.col-1] == '=' and self.col <= len(self.text)-1 and self.text[self.col] == '>':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.IMPLIES))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.IMPLIES, 'IMPLIES'))
                 self.col += 1
             elif self.text[self.col-1] == '<' and self.col+1 <= len(self.text)-1 and self.text[self.col] == '=' and self.text[self.col+1] == '>':
-                self.tokens.append(Token(Location(self.col, self.line), TokenKind.IFF))
+                tokens.append(Token(Location(self.line, self.col), TokenKind.IFF, 'IFF'))
                 self.col += 2
-            elif self.text[self.col-1] == '\n':
-                self.line += 1
-            else: # any other invalid character
-                raise NotImplementedError
+            elif self.text[self.col-1] == ',':
+                tokens.append(Token(Location(self.line, self.col), TokenKind.COMMA, 'comma'))
+            elif self.text[self.col-1] != ' ': # any other invalid character
+                invalid_tokens.append(Token(Location(self.line, self.col), None, self.text[self.col-1]))
             self.col += 1
-        if len(self.tokens) >= 1:
-            return self.tokens
+        if len(invalid_tokens) == 0:
+            return tokens
         else:
-            raise NotImplementedError
+            return invalid_tokens

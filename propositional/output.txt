@@ -1,0 +1,41 @@
+Input #1:
+---------
+Proposition			: Q$
+SyntaxError(s)		: $ (line 1, col 2)
+
+Input #2:
+---------
+Proposition			: !Q
+Lexer				: [ NOT, ID ]
+Parser				: [ propositions, proposition, compound, NOT, proposition, atomic, ID, more_propositions, epsilon ]
+
+Input #3:
+---------
+Proposition			: )Q
+Lexer				: [ RPAR, ID ]
+Parser				: Errors -> [ invalid set of parentheses ]
+
+Input #4:
+---------
+Proposition			: P <=> Q
+Lexer				: [ ID, IFF, ID ]
+Parser				: [ propositions, proposition, compound, ID, connective, IFF, proposition, atomic, ID, more_propositions, epsilon ]
+
+Input #5:
+---------
+Proposition			: ( P /\ Q )
+Lexer				: [ LPAR, ID, AND, ID, RPAR ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, ID, connective, AND, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+
+Input #6:
+---------
+Proposition			: !Q)P!
+Lexer				: [ NOT, ID, RPAR, ID, NOT ]
+Parser				: Errors -> [ invalid NOT symbol (line 6, col 5), invalid set of parentheses ]
+
+Input #7:
+---------
+Proposition			: ( P \/ Q ) , ( X => Y )
+Lexer				: [ LPAR, ID, OR, ID, RPAR, comma, LPAR, ID, IMPLIES, ID, RPAR ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+

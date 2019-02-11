@@ -1,2 +1,1 @@
-
-        f_str += c
+                if type(tokens) is not str:
