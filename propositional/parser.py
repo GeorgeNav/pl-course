@@ -131,4 +131,3 @@ class Parser:
             self.errors.append(s)
         elif token != None and s != None: # specific type and location of error
             self.errors.append(s + ' (line ' + str(token.loc.line) + ', col ' + str(token.loc.col) + ')')
-
