@@ -17,8 +17,9 @@ class Parser:
         self.errors = []
 
     def parse(self):
-        if not self.find_error():
-            self.propositions()
+        self.find_error()
+        self.propositions()
+        if len(self.errors) == 0:
             print(self.parse_tree)
             return str(self.parse_tree).replace('[', '[ ').replace(']', ' ]')
         else:
@@ -27,11 +28,9 @@ class Parser:
     
     def find_error(self):
         wrappers = 0
-        error = False
         for i, token in enumerate(self.tokenlist):
             if token.kind == TokenKind.ID and i-1 >= 0 and self.tokenlist[i-1].kind == TokenKind.ID:
                 self.error('invalid ID', token)
-                error = True
             elif token.kind == TokenKind.LPAR:
                 wrappers -= 1
             elif token.kind == TokenKind.RPAR:
@@ -41,11 +40,8 @@ class Parser:
                 i+1 < len(self.tokenlist)
                 and self.tokenlist[i+1].kind != TokenKind.LPAR and self.tokenlist[i+1].kind != TokenKind.ID):
                     self.error('invalid NOT symbol', token)
-                    error = True
         if wrappers != 0:
             self.error('invalid set of parentheses', None)
-            error = True
-        return error
 
     def propositions(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
@@ -74,13 +70,21 @@ class Parser:
     def compound(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
         if self.top() == TokenKind.ID:
-            self.pop() # ID
+            self.pop() # ID or RPAR
+            self.connective()
+            self.proposition()
+        elif self.isConnective(self.top()):
             self.connective()
             self.proposition()
         elif self.top() == TokenKind.LPAR:
             self.pop() # LPAR
             self.proposition()
-            self.pop() # RPAR
+            if len(self.tokenlist) > 1 and self.isConnective(self.tokenlist[1].kind):
+                self.pop()
+                self.connective()
+                self.proposition()
+            else:
+                self.pop() # RPAR
         elif self.top() == TokenKind.NOT:
             self.pop() # NOT
             self.proposition()
@@ -100,17 +104,18 @@ class Parser:
             return False
 
     def isCompound(self):
-        if(self.top() == TokenKind.ID
-        and len(self.tokenlist) > 1
-        and self.isConnective(self.tokenlist[1].kind) == True
+        if(len(self.tokenlist) > 1 and self.isConnective(self.tokenlist[1].kind)
         or self.top() == TokenKind.LPAR or self.top() == TokenKind.NOT):
             return True
         else:
             return False
 
     def pop(self):
-        self.loc = self.tokenlist[0].loc
-        self.parse_tree.append(str(self.tokenlist.pop(0)))
+        if not self.isEmpty():
+            self.parse_tree.append(str(self.tokenlist.pop(0)))
+        else:
+            self.errors.append('Missing value')
+
 
     def isEmpty(self):
         if len(self.tokenlist) == 0:

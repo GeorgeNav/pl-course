@@ -39,3 +39,9 @@ Proposition			: ( P \/ Q ) , ( X => Y )
 Lexer				: [ LPAR, ID, OR, ID, RPAR, comma, LPAR, ID, IMPLIES, ID, RPAR ]
 Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
 
+Input #8:
+---------
+Proposition			: (Q) => (P\/Q)
+Lexer				: [ LPAR, ID, RPAR, IMPLIES, LPAR, ID, OR, ID, RPAR ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID, RPAR, connective, IMPLIES, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+
