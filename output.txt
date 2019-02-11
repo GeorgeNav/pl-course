@@ -13,7 +13,7 @@ Input #3:
 ---------
 Proposition			: )Q
 Lexer				: [ RPAR, ID ]
-Parser				: Errors -> [ invalid set of parentheses ]
+Parser				: Error(s) -> [ invalid set of parentheses ]
 
 Input #4:
 ---------
@@ -31,7 +31,7 @@ Input #6:
 ---------
 Proposition			: !Q)P!
 Lexer				: [ NOT, ID, RPAR, ID, NOT ]
-Parser				: Errors -> [ invalid NOT symbol (line 6, col 5), invalid set of parentheses ]
+Parser				: Error(s) -> [ invalid NOT symbol (line 6, col 5), invalid set of parentheses ]
 
 Input #7:
 ---------
@@ -44,4 +44,10 @@ Input #8:
 Proposition			: (Q) => (P\/Q)
 Lexer				: [ LPAR, ID, RPAR, IMPLIES, LPAR, ID, OR, ID, RPAR ]
 Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID, RPAR, connective, IMPLIES, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+
+Input #9:
+---------
+Proposition			: Q =>
+Lexer				: [ ID, IMPLIES ]
+Parser				: Error(s) -> [ Missing value ]
 

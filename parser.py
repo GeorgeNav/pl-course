@@ -24,7 +24,7 @@ class Parser:
             return str(self.parse_tree).replace('[', '[ ').replace(']', ' ]')
         else:
             print(self.errors)
-            return 'Errors -> ' + str(self.errors).replace('[', '[ ').replace(']', ' ]')
+            return 'Error(s) -> ' + str(self.errors).replace('[', '[ ').replace(']', ' ]')
     
     def find_error(self):
         wrappers = 0
