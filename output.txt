@@ -19,35 +19,41 @@ Input #4:
 ---------
 Proposition			: P <=> Q
 Lexer				: [ ID, IFF, ID ]
-Parser				: [ propositions, proposition, compound, ID, connective, IFF, proposition, atomic, ID, more_propositions, epsilon ]
+Parser				: [ propositions, proposition, compound, atomic, ID, connective, IFF, proposition, atomic, ID, more_propositions, epsilon ]
 
 Input #5:
 ---------
 Proposition			: ( P /\ Q )
 Lexer				: [ LPAR, ID, AND, ID, RPAR ]
-Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, ID, connective, AND, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, AND, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
 
 Input #6:
 ---------
 Proposition			: !Q)P!
 Lexer				: [ NOT, ID, RPAR, ID, NOT ]
-Parser				: Error(s) -> [ invalid NOT symbol (line 6, col 5), invalid set of parentheses ]
+Parser				: Error(s) -> [ invalid set of parentheses, invalid NOT symbol (line 6, col 5) ]
 
 Input #7:
 ---------
 Proposition			: ( P \/ Q ) , ( X => Y )
 Lexer				: [ LPAR, ID, OR, ID, RPAR, comma, LPAR, ID, IMPLIES, ID, RPAR ]
-Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
 
 Input #8:
 ---------
 Proposition			: (Q) => (P\/Q)
 Lexer				: [ LPAR, ID, RPAR, IMPLIES, LPAR, ID, OR, ID, RPAR ]
-Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID, RPAR, connective, IMPLIES, proposition, compound, LPAR, proposition, compound, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID, RPAR, connective, IMPLIES, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
 
 Input #9:
 ---------
 Proposition			: Q => P
 Lexer				: [ ID, IMPLIES, ID ]
-Parser				: [ propositions, proposition, compound, ID, connective, IMPLIES, proposition, atomic, ID, more_propositions, epsilon ]
+Parser				: [ propositions, proposition, compound, atomic, ID, connective, IMPLIES, proposition, atomic, ID, more_propositions, epsilon ]
+
+Input #10:
+---------
+Proposition			: )Q( ) (
+Lexer				: [ RPAR, ID, LPAR, RPAR, LPAR ]
+Parser				: Error(s) -> [ invalid set of parentheses ]
 

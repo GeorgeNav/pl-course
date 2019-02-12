@@ -40,8 +40,10 @@ class Parser:
                 i+1 < len(self.tokenlist)
                 and self.tokenlist[i+1].kind != TokenKind.LPAR and self.tokenlist[i+1].kind != TokenKind.ID):
                     self.error('invalid NOT symbol', token)
-        if wrappers != 0:
-            self.error('invalid set of parentheses', None)
+            if wrappers > 0 and 'invalid set of parentheses' not in self.errors:
+                self.error('invalid set of parentheses', None)
+        if wrappers != 0 and 'invalid set of parentheses' not in self.errors:
+            self.error('invalid set of parenthesis', None)
 
     def propositions(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
