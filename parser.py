@@ -20,11 +20,9 @@ class Parser:
         self.find_error()
         self.propositions()
         if len(self.errors) == 0:
-            print(self.parse_tree)
             return str(self.parse_tree).replace('[', '[ ').replace(']', ' ]')
         else:
-            print(self.errors)
-            return 'Error(s) -> ' + str(self.errors).replace('[', '[ ').replace(']', ' ]')
+            raise SyntaxError(str(self.errors).replace('[', '').replace(']', '').replace(', ', ' | '))
 
     def find_error(self):
         wrappers = 0
@@ -33,17 +31,23 @@ class Parser:
                 self.error('invalid ID', token)
             elif token.kind == TokenKind.LPAR:
                 wrappers -= 1
+                if wrappers > 0:
+                    self.error('invalid parentheses', token)
+                elif i-1 >= 0 and not self.is_connective(self.tokenlist[i-1].kind):
+                    self.error('expecting connective ', self.tokenlist[i-1])
             elif token.kind == TokenKind.RPAR:
                 wrappers += 1
+                if wrappers > 0:
+                    self.error('invalid parentheses', token)
+                elif len(self.tokenlist) > i+1 and not self.is_connective(self.tokenlist[i+1].kind):
+                    self.error('expecting connective ', self.tokenlist[i+1])
             elif token.kind == TokenKind.NOT:
                 if(i+1 == len(self.tokenlist) or
                 i+1 < len(self.tokenlist)
                 and self.tokenlist[i+1].kind != TokenKind.LPAR and self.tokenlist[i+1].kind != TokenKind.ID):
                     self.error('invalid NOT symbol', token)
-            if wrappers > 0 and 'invalid set of parentheses' not in self.errors:
-                self.error('invalid set of parentheses', None)
-        if wrappers != 0 and 'invalid set of parentheses' not in self.errors:
-            self.error('invalid set of parenthesis', None)
+        if wrappers != 0 and 'invalid parentheses' not in self.errors:
+            self.error('invalid parenthesis', None)
 
     def propositions(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
@@ -52,51 +56,46 @@ class Parser:
 
     def more_propositions(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
-        if self.isEmpty():
+        if self.is_empty():
             self.parse_tree.append('epsilon')
-        elif self.top() == TokenKind.COMMA:
-            self.pop() # comma
+        elif self.top_kind() == TokenKind.COMMA:
+            self.pop(TokenKind.COMMA) # comma
             self.propositions()
 
     def proposition(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
-        if not self.isCompound():
+        if not self.is_compound():
             self.atomic()
         else:
             self.compound()
 
     def atomic(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
-        self.pop() # ID
+        self.pop(TokenKind.ID) # ID
 
     def compound(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
-        if self.top() == TokenKind.ID:
+        if self.top_kind() == TokenKind.ID:
             self.atomic() # ID or RPAR
             self.connective()
             self.proposition()
-        elif self.isConnective(self.top()):
+        elif self.is_connective(self.top_kind()):
             self.connective()
             self.proposition()
-        elif self.top() == TokenKind.LPAR:
-            self.pop() # LPAR
+        elif self.top_kind() == TokenKind.LPAR:
+            self.pop(TokenKind.LPAR) # LPAR
             self.proposition()
-            if len(self.tokenlist) > 1 and self.isConnective(self.tokenlist[1].kind):
-                self.pop()
-                self.connective()
-                self.proposition()
-            else:
-                self.pop() # RPAR
-        elif self.top() == TokenKind.NOT:
-            self.pop() # NOT
+            self.pop(TokenKind.RPAR) # RPAR
+        elif self.top_kind() == TokenKind.NOT:
+            self.pop(TokenKind.NOT) # NOT
             self.proposition()
 
     def connective(self):
         self.parse_tree.append(sys._getframe().f_code.co_name) # prints function name
-        self.pop() # Connective
+        self.pop(self.top_kind()) # Connective
 
     # add more methods if needed
-    def isConnective(self, kind):
+    def is_connective(self, kind):
         if(kind == TokenKind.AND
         or kind == TokenKind.OR
         or kind == TokenKind.IMPLIES
@@ -105,36 +104,53 @@ class Parser:
         else:
             return False
 
-    def isCompound(self):
-        if(len(self.tokenlist) > 1 and self.isConnective(self.tokenlist[1].kind)
-        or self.top() == TokenKind.LPAR or self.top() == TokenKind.NOT):
+    def is_compound(self):
+        if(len(self.tokenlist) > 1 and self.is_connective(self.tokenlist[1].kind)
+        or self.top_kind() == TokenKind.LPAR or self.top_kind() == TokenKind.NOT):
             return True
         else:
             return False
 
-    def pop(self):
-        if not self.isEmpty():
+    def pop(self, kind):
+        if not self.is_empty() and kind is self.top_kind():
+            self.loc = self.tokenlist[0].loc
             self.parse_tree.append(str(self.tokenlist.pop(0)))
         else:
-            self.errors.append('Missing value')
+            self.errors.append('TokenType ' + self.str_kind(kind) + ' not found after line' + str(self.loc.line) + ',col' + str(self.loc.col))
+    
 
-
-    def isEmpty(self):
+    def is_empty(self):
         if len(self.tokenlist) == 0:
             return True
         else:
             return False
 
-    def top(self):
-        if not self.isEmpty():
+    def top_kind(self):
+        if not self.is_empty():
             return self.tokenlist[0].kind
         else:
             return None
  
     def error(self, s, token):
         if token != None and s == None: # general location
-            self.errors.append('(line ' + str(token.loc.line) + ', col ' + str(token.loc.col) + ')')
+            self.errors.append('(line' + str(token.loc.line) + ',col' + str(token.loc.col) + ')')
         elif s != None and token == None: # general type of error
             self.errors.append(s)
         elif token != None and s != None: # specific type and location of error
-            self.errors.append(s + ' (line ' + str(token.loc.line) + ', col ' + str(token.loc.col) + ')')
+            self.errors.append(s + ' (line' + str(token.loc.line) + ',col' + str(token.loc.col) + ')')
+
+    def str_kind(self, kind):
+        if kind is TokenKind.ID:
+            return 'ID'
+        elif kind is TokenKind.RPAR:
+            return 'RPAR'
+        elif kind is TokenKind.RPAR:
+            return 'LPAR'
+        elif kind is TokenKind.NOT:
+            return 'NOT'
+        elif kind is TokenKind.AND or kind is TokenKind.OR or kind is TokenKind.IMPLIES or kind is TokenKind.IFF:
+            return 'CONNECTIVE'
+        elif kind is TokenKind.COMMA:
+            return 'COMMA'
+        elif kind is None:
+            return 'INVALID_KIND'

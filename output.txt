@@ -6,14 +6,15 @@ Parser				: [ propositions, proposition, atomic, ID, more_propositions, epsilon 
 
 Input #2:
 ---------
-Proposition			: !Q=
-SyntaxError(s)		: = (line 2, col 3)
+Proposition			: !Q
+Lexer				: [ NOT, ID ]
+Parser				: [ propositions, proposition, compound, NOT, proposition, atomic, ID, more_propositions, epsilon ]
 
 Input #3:
 ---------
 Proposition			: )Q
 Lexer				: [ RPAR, ID ]
-Parser				: Error(s) -> [ invalid set of parentheses ]
+ParserSyntaxError(s): 'invalid parentheses (line3,col1)' | 'invalid parenthesis' | 'TokenType ID not found after line0,col0'
 
 Input #4:
 ---------
@@ -31,29 +32,16 @@ Input #6:
 ---------
 Proposition			: !Q)P!
 Lexer				: [ NOT, ID, RPAR, ID, NOT ]
-Parser				: Error(s) -> [ invalid set of parentheses, invalid NOT symbol (line 6, col 5) ]
+ParserSyntaxError(s): 'invalid parentheses (line6,col3)' | 'invalid NOT symbol (line6,col5)' | 'invalid parenthesis'
 
 Input #7:
 ---------
 Proposition			: ( P \/ Q ) , ( X => Y )
 Lexer				: [ LPAR, ID, OR, ID, RPAR, comma, LPAR, ID, IMPLIES, ID, RPAR ]
-Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
+ParserSyntaxError(s): 'expecting connective  (line7,col12)' | 'expecting connective  (line7,col12)'
 
 Input #8:
 ---------
-Proposition			: (Q) => (P\/Q)
-Lexer				: [ LPAR, ID, RPAR, IMPLIES, LPAR, ID, OR, ID, RPAR ]
-Parser				: [ propositions, proposition, compound, LPAR, proposition, atomic, ID, RPAR, connective, IMPLIES, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
-
-Input #9:
----------
-Proposition			: Q => P
-Lexer				: [ ID, IMPLIES, ID ]
-Parser				: [ propositions, proposition, compound, atomic, ID, connective, IMPLIES, proposition, atomic, ID, more_propositions, epsilon ]
-
-Input #10:
----------
-Proposition			: )Q( ) (
-Lexer				: [ RPAR, ID, LPAR, RPAR, LPAR ]
-Parser				: Error(s) -> [ invalid set of parentheses ]
-
+Proposition			: ( P \/ Q ) ( P )
+Lexer				: [ LPAR, ID, OR, ID, RPAR, LPAR, ID, RPAR ]
+ParserSyntaxError(s): 'expecting connective  (line8,col12)' | 'expecting connective  (line8,col10)'

@@ -18,7 +18,6 @@ with open(input_file_path) as f:
             f_lines.append('')
             i += 1
         c = f.read(1)
-    print('End of file')
     # f_str = f.read()
 
 class Test(unittest.TestCase):
@@ -35,19 +34,26 @@ class Test(unittest.TestCase):
                 f.write('\n---------')
                 f.write('\nProposition\t\t\t: ')
                 f.write(f_lines[i].replace('\'', ''))
-                if tokens[0].kind != None:
+                lexerouput = str(tokens).replace('\'', '').replace('[', '[ ').replace(']', ' ]')
+                if tokens[0].kind is not None:
                     f.write('\nLexer\t\t\t\t: ')
-                    f.write(str(tokens).replace('\'', '').replace('[', '[ ').replace(']', ' ]'))
-                    f.write('\nParser\t\t\t\t: ')
-                    tokens = Parser(tokens).parse()
-                    f.write(str(tokens).replace('\'', ''))
+                    f.write(lexerouput)
+                    try:
+                        tokens = Parser(tokens).parse()
+                        f.write('\nParser\t\t\t\t: ')
+                        f.write(str(tokens).replace('\'', ''))
+                    except Exception as e:
+                        f.write('\nParserSyntaxError(s): ' + str(e))
                 else:
                     f.write('\nSyntaxError(s)\t\t: ')
                     for i, invalidToken in enumerate(tokens):
                         f.write(str(invalidToken) + ' (line ' + str(invalidToken.loc.line) + ', col '+ str(invalidToken.loc.col) + ')')
                         if i+1 != len(tokens):
                             f.write(' | ')
-                f.write('\n\n')
+                if len(tokenlists)-1 != i:
+                    f.write('\n\n')
+        with open(output_file_path, 'r') as f:
+            print(f.read())
 
 if __name__ == '__main__':
     unittest.main()
