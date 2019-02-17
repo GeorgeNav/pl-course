@@ -38,7 +38,7 @@ Input #7:
 ---------
 Proposition			: ( P \/ Q ) , ( X => Y )
 Lexer				: [ LPAR, ID, OR, ID, RPAR, comma, LPAR, ID, IMPLIES, ID, RPAR ]
-ParserSyntaxError(s): 'expecting connective  (line7,col12)' | 'expecting connective  (line7,col12)'
+Parser				: [ propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, OR, proposition, atomic, ID, RPAR, more_propositions, comma, propositions, proposition, compound, LPAR, proposition, compound, atomic, ID, connective, IMPLIES, proposition, atomic, ID, RPAR, more_propositions, epsilon ]
 
 Input #8:
 ---------

@@ -33,13 +33,13 @@ class Parser:
                 wrappers -= 1
                 if wrappers > 0:
                     self.error('invalid parentheses', token)
-                elif i-1 >= 0 and not self.is_connective(self.tokenlist[i-1].kind):
+                elif i-1 >= 0 and self.tokenlist[i-1].kind != TokenKind.COMMA and not self.is_connective(self.tokenlist[i-1].kind):
                     self.error('expecting connective ', self.tokenlist[i-1])
             elif token.kind == TokenKind.RPAR:
                 wrappers += 1
                 if wrappers > 0:
                     self.error('invalid parentheses', token)
-                elif len(self.tokenlist) > i+1 and not self.is_connective(self.tokenlist[i+1].kind):
+                elif len(self.tokenlist) > i+1 and self.tokenlist[i+1].kind != TokenKind.COMMA and not self.is_connective(self.tokenlist[i+1].kind):
                     self.error('expecting connective ', self.tokenlist[i+1])
             elif token.kind == TokenKind.NOT:
                 if(i+1 == len(self.tokenlist) or
